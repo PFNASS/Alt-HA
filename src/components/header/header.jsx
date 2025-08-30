@@ -37,7 +37,7 @@ export function Header() {
 
   return (
     <AppBar position="sticky" class="w-full">
-      <Container maxWidth="xl">
+      <Container maxWidth="false">
         <Toolbar disableGutters>
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
