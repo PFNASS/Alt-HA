@@ -12,13 +12,15 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import { useLocation } from 'preact-iso';
 
-const pages = ['Products', 'Pricing', 'Blog'];
+const pages = [{"name": "Home", "path": "/"}, {"name":"Socket Logs", "path":"/sockets"}];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 export function Header() {
   const [anchorElNav, setAnchorElNav] = useState(false);
   const [anchorElUser, setAnchorElUser] = useState(null);
+   const location = useLocation();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -35,7 +37,13 @@ export function Header() {
     setAnchorElUser(null);
   };
 
+  const handleNavigate = (e) => {
+    console.log(e.currentTarget.id)
+    location.route(`${e.currentTarget.id}`)
+  }
+
   return (
+    <div class="w-screen">
     <AppBar position="sticky" class="w-full">
       <Container maxWidth="false">
         <Toolbar disableGutters>
@@ -86,8 +94,8 @@ export function Header() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+                <MenuItem key={page.name} id={page.path} onClick={handleNavigate}>
+                  <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -114,11 +122,11 @@ export function Header() {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+                key={page.name}
+                // onClick={handleNavigate}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                {page.name}
               </Button>
             ))}
           </Box>
@@ -154,5 +162,6 @@ export function Header() {
         </Toolbar>
       </Container>
     </AppBar>
+    </div>
   );
 }

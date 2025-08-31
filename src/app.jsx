@@ -1,37 +1,18 @@
 import {useState} from 'react';
+import { LocationProvider, Router, Route } from 'preact-iso';
 import { Header } from './components/header/header';
 // import { Socket } from './socket/socket';
-import Home from './pages/Home';
+import HomePage from './pages/Home';
 import Socket from './pages/Socket';
 
 export function App() {
-  // const [anchorElNav, setAnchorElNav] = useState(false);
-  // const [anchorElUser, setAnchorElUser] = useState(null);
-
-  // const handleOpenNavMenu = (event) => {
-  //   setAnchorElNav(event.currentTarget);
-  // };
-  // const handleOpenUserMenu = (event) => {
-  //   setAnchorElUser(event.currentTarget);
-  // };
-  // const handleCloseNavMenu = () => {
-  //   setAnchorElNav(null);
-  // };
-  // const handleCloseUserMenu = () => {
-  //   setAnchorElUser(null);
-  // };
-  const pages = ['Products', 'Pricing', 'Blog'];
-  const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
   return (
-    <>
-      <div class="flex">
-        <div class="w-screen">
-          <Header pages={pages} settings={settings}/>
-          <Home />
-          <Socket />
-        </div>
-      </div>
-    </>
+    <LocationProvider>
+      <Header/>
+        <Router>
+            <Route path="/" component={HomePage}/>
+            <Route path="/sockets" component={Socket} />
+        </Router>
+    </LocationProvider>
   );
 }
