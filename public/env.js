@@ -1,0 +1,3 @@
+window.env = {
+  "TOKEN": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI5ZjEzYmZiOGIyYWU0NTk2OTc5OTE3ZTllZjJiNGM2YiIsImlhdCI6MTc1NjUyNDQyNywiZXhwIjoyMDcxODg0NDI3fQ.-06Ulalqb14roztJ1ee8Cw-E9jbisVZh5IxGZajOQPc"
+};

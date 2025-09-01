@@ -1,18 +1,17 @@
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import SocketContext from '../context/socketContext';
+import { SocketContext } from '../context/socketContext';
 import { SocketContextDispatch } from '../context/socketContext';
-// import { FixedSizeList } from 'react-window';
-// import { SocketInit } from '../socket/socket';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { stringify } from 'structured-clone-es';
 
 export default function SocketPage() {
   // const [socketAuth, setSocketAuth] = useState(false);
-  const socketAuth = useContext(SocketContext);
+  const socketState = useContext(SocketContext);
   const socketDispatch = useContext(SocketContextDispatch);
   const socketUrl = `${import.meta.env.VITE_WS_URL}`;
 
@@ -22,48 +21,72 @@ export default function SocketPage() {
       shouldReconnect: (closeEvent) => true,
   });
 
-  const StartWebSocket = () => {
-    return { sendMessage, lastMessage, readyState };
-  }
-
-//   React.useEffect(() => {
-//     if (!socketAuth) {
-//         <Button onClick={StartWebSocket}>Authenticate Socket</Button>
-//     } else {
-//         console.log("Socket Authenticated")
-//     }
-//   }, [socketAuth]);
-
-  const sendAuth = useCallback(() => sendMessage(stringify({
+    const sendAuthObject = useCallback(() => sendMessage(JSON.stringify({
         "type": "auth",
         "access_token": `${import.meta.env.VITE_TOKEN}`
   }), true));
 
+    // if (!socketState.authenticated) {
+    //     const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+    //         onOpen: () => console.log("opening websocket"),
+    //         onMessage: (event) => MessageReceived(event),
+    //         shouldReconnect: (closeEvent) => true,
+    //     });
+    // }
+
+//   useEffect(() => {
+//   },[socketState.authenticated])
+
   const MessageReceived = (e) => {
-    const messageData = parse(e.data);
+    const messageData = JSON.parse(e.data);
     console.log(`Message Received: ${messageData.type}`)
-    if (!socketAuth && messageData.type == "auth_required") {
-        sendAuth();
+    if (messageData.type == "auth_required") {
+        socketDispatch({
+            type: 'SET_AUTH',
+            newAuthStatus: false,
+            newReadyState: 0
+        })
+        sendAuthObject();
+        console.log("Sending Token to endpoint. ReadyState = CONNECTING")
+    } else if (!socketState.authenticated && messageData.type == "auth_ok") {
+        socketDispatch({
+            type: 'SET_AUTH',
+            newAuthStatus: true,
+            newReadyState: 1
+        })
+        console.log("Connected to Websocket. ReadyState = OPEN")
+    } else {
         console.log(messageData)
     }
   }
 
-  const handleClickSendMessage = useCallback(() => sendMessage(stringify({
-    "id": "19",
-    "type": "get_states"
-  }), true), []);
+//   const SubscribeToStateUpdates = () => {
+//         useCallback(() => sendMessage(JSON.stringify({
+//             "id": 18,
+//             "type": "subscribe_events",
+//         })));
+//   }
+
+    const SubscribeToStateUpdates = useCallback(() => sendMessage(JSON.stringify({
+            "id": "18",
+            "type": "subscribe_events",
+    }), true));
+
+    const handleClickSendMessage = useCallback(() => sendMessage(JSON.stringify({
+        "id": "19",
+        "type": "get_states"
+    }), true));
 
   return (
     <div>
-        <h1>{console.log(socketAuth)}</h1>
         <h1>Socket Test</h1>
-        {/* {
-            socketAuth ? (
-                <Button onClick={handleClickSendMessage} variant="contained">Send Message</Button>
+        {
+            socketState.authenticated ? (
+                <Button onClick={handleClickSendMessage} variant="contained">Subscribe to HA Events</Button>
             ) : (
-                <Button onClick={SocketInit()} variant="contained">Start Websocket</Button>
+                <Button onClick={useContext} variant="contained">Start Websocket</Button>
             )
-        } */}
+        }
 
     </div>
   );

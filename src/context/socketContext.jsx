@@ -22,12 +22,13 @@ export default function SocketProvider({ children }) {
   );
 }
 
-function socketReducer(socket, action) {
+function socketReducer(state, action) {
   switch (action.type) {
     case 'SET_AUTH':
       return {
         ...state,
-        authenticated: action.payload,
+        authenticated: action.newAuthStatus,
+        readyState: action.newReadyStatus
       };
     case 'SET_LAST_MESSAGE':
       return {
@@ -40,28 +41,6 @@ function socketReducer(socket, action) {
         readyState: action.payload,
       };
     default:
-      return state;
+      return socketState;
   }
 };
-// const SocketInit = () => {
-//   const socketUrl = `${import.meta.env.VITE_WS_URL}`;
-//   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
-//     onOpen: () => console.log("opening websocket"),
-//     onMessage: (event) => MessageReceived(event),
-//     shouldReconnect: (closeEvent) => true,
-//   });
-
-//     const MessageReceived = (e) => {
-//     const messageData = parse(e.data);
-//     console.log(`Message Received: ${messageData.type}`)
-//     if (messageData.type == "auth_required") {
-//         sendAuth();
-//         console.log(messageData)
-//     }
-//   }
-
-//   initialState.sendMessage = sendMessage;
-//   initialState.lastMessage = lastMessage;
-//   initialState.readyState = readyState;
-//   return { sendMessage, lastMessage, readyState };
-// };
