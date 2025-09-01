@@ -7,16 +7,16 @@ const SocketInit = () => {
     onMessage: (event) => MessageReceived(event),
     shouldReconnect: (closeEvent) => true,
   });
-  return { sendMessage, lastMessage, readyState };
+  return { sendMessage, lastMessage, readyState, onMessage };
 };
 
-  const MessageReceived = (e) => {
-    const messageData = parse(e.data);
-    console.log(`Message Received: ${messageData.type}`)
-    if (messageData.type == "auth_required") {
-        sendAuth();
-        console.log(messageData)
-    }
-  }
+  // const MessageReceived = (e) => {
+  //   const messageData = parse(e.data);
+  //   console.log(`Message Received: ${messageData.type}`)
+  //   if (messageData.type == "auth_required") {
+  //       sendAuth();
+  //       console.log(messageData)
+  //   }
+  // }
 
 export default { SocketInit, MessageReceived };

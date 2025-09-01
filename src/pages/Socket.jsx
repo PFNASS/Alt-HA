@@ -1,16 +1,19 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useContext } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import SocketContext from '../context/socketContext';
+import { SocketContextDispatch } from '../context/socketContext';
 // import { FixedSizeList } from 'react-window';
-import { SocketInit } from '../socket/socket';
+// import { SocketInit } from '../socket/socket';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 
 export default function SocketPage() {
-  const [socketAuth, setSocketAuth] = useState(false);
-
+  // const [socketAuth, setSocketAuth] = useState(false);
+  const socketAuth = useContext(SocketContext);
+  const socketDispatch = useContext(SocketContextDispatch);
   const socketUrl = `${import.meta.env.VITE_WS_URL}`;
 
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
@@ -30,8 +33,6 @@ export default function SocketPage() {
 //         console.log("Socket Authenticated")
 //     }
 //   }, [socketAuth]);
-
-  const EstablishSocket()
 
   const sendAuth = useCallback(() => sendMessage(stringify({
         "type": "auth",
@@ -54,14 +55,15 @@ export default function SocketPage() {
 
   return (
     <div>
+        <h1>{console.log(socketAuth)}</h1>
         <h1>Socket Test</h1>
-        {
+        {/* {
             socketAuth ? (
                 <Button onClick={handleClickSendMessage} variant="contained">Send Message</Button>
             ) : (
                 <Button onClick={SocketInit()} variant="contained">Start Websocket</Button>
             )
-        }
+        } */}
 
     </div>
   );
