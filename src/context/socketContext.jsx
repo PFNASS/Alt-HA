@@ -41,6 +41,6 @@ function socketReducer(state, action) {
         readyState: action.payload,
       };
     default:
-      return socketState;
+      return state;
   }
 };

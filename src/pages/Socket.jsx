@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { useState, useCallback, useContext } from 'preact/hooks';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ListItem from '@mui/material/ListItem';
@@ -7,35 +7,48 @@ import ListItemText from '@mui/material/ListItemText';
 import { SocketContext } from '../context/socketContext';
 import { SocketContextDispatch } from '../context/socketContext';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
-import { stringify } from 'structured-clone-es';
+// import VirtualList from 'preact-virtual-list';
 
 export default function SocketPage() {
   // const [socketAuth, setSocketAuth] = useState(false);
   const socketState = useContext(SocketContext);
   const socketDispatch = useContext(SocketContextDispatch);
-  const socketUrl = `${import.meta.env.VITE_WS_URL}`;
+  const [socketMessages, setSocketMessages] = useState([]);
 
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+//   const DATA = [{
+//     name: 'Item 1'
+//     }, {
+//         name: 'Item 2'
+//   }];
+
+//   const Row = row => (
+//     <div class="row">{row}</div>
+//   );
+
+    const renderRow = (row) => {
+        return <div class="row">{row}</div>;
+    }
+
+
+  const OpenWebsocket = useCallback(() => {
+    console.log("Opening Websocket");
+    return new Promise((resolve) => {
+        setTimeout(() => {
+        resolve(`${import.meta.env.VITE_WS_URL}`);
+        }, 2000);
+    });
+  }, []);
+
+  const { sendMessage, lastMessage, readyState } = useWebSocket(OpenWebsocket, {
       onOpen: () => console.log("opening websocket"),
       onMessage: (event) => MessageReceived(event),
       shouldReconnect: (closeEvent) => true,
   });
 
-    const sendAuthObject = useCallback(() => sendMessage(JSON.stringify({
-        "type": "auth",
-        "access_token": `${import.meta.env.VITE_TOKEN}`
+  const sendAuthObject = useCallback(() => sendMessage(JSON.stringify({
+      "type": "auth",
+      "access_token": `${import.meta.env.VITE_TOKEN}`
   }), true));
-
-    // if (!socketState.authenticated) {
-    //     const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
-    //         onOpen: () => console.log("opening websocket"),
-    //         onMessage: (event) => MessageReceived(event),
-    //         shouldReconnect: (closeEvent) => true,
-    //     });
-    // }
-
-//   useEffect(() => {
-//   },[socketState.authenticated])
 
   const MessageReceived = (e) => {
     const messageData = JSON.parse(e.data);
@@ -56,65 +69,32 @@ export default function SocketPage() {
         })
         console.log("Connected to Websocket. ReadyState = OPEN")
     } else {
-        console.log(messageData)
+        setSocketMessages([...socketMessages, messageData]);
     }
   }
 
-//   const SubscribeToStateUpdates = () => {
-//         useCallback(() => sendMessage(JSON.stringify({
-//             "id": 18,
-//             "type": "subscribe_events",
-//         })));
-//   }
-
     const SubscribeToStateUpdates = useCallback(() => sendMessage(JSON.stringify({
-            "id": "18",
-            "type": "subscribe_events",
-    }), true));
-
-    const handleClickSendMessage = useCallback(() => sendMessage(JSON.stringify({
-        "id": "19",
-        "type": "get_states"
+        "id": 18,
+        "type": "subscribe_events",
+        "event_type": "state_changed"
     }), true));
 
   return (
     <div>
-        <h1>Socket Test</h1>
         {
             socketState.authenticated ? (
-                <Button onClick={handleClickSendMessage} variant="contained">Subscribe to HA Events</Button>
+            <div>
+                <Button onClick={SubscribeToStateUpdates} variant="contained">Subscribe to HA Events</Button>
+                {/* <VirtualList sync class="list"
+                    data={socketMessages}
+                    rowHeight={40}
+                    renderRow={renderRow}
+                /> */}
+            </div>
             ) : (
-                <Button onClick={useContext} variant="contained">Start Websocket</Button>
+                <h1>Unauthenticated</h1>
             )
         }
-
     </div>
   );
 }
-//   );
-//     }
-//     <ListItem style={style} key={index} component="div" disablePadding>
-//       <ListItemButton>
-//         <ListItemText primary={`Item ${index + 1}`} />
-//       </ListItemButton>
-//     </ListItem>
-//   );
-// }
-
-// export default function VirtualizedList() {
-//   return (
-//     <Box
-//       sx={{ width: '100%', height: 400, maxWidth: 360, bgcolor: 'background.paper' }}
-//     >
-//       <FixedSizeList
-//         height={400}
-//         width={360}
-//         itemSize={46}
-//         itemCount={200}
-//         overscanCount={5}
-//       >
-//         {renderRow}
-//       </FixedSizeList>
-//     </Box>
-//   );
-// }
